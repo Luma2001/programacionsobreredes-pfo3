@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PFO 3 - Sistema Distribuido con Sockets y Workers</title>
+    <!-- Inclusión de Mermaid.js para renderizar el diagrama de arquitectura -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    </script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --bg: #0b1120;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --code-bg: #020617;
+            --accent-green: #10b981;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 26px;
+            color: #ffffff;
+        }
+
+        .badge {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid #3b82f6;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        /* Botón de GitHub */
+        .btn-github {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--primary);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn-github:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-github svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        h2 {
+            color: #ffffff;
+            margin-top: 36px;
+            font-size: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        /* Contenedor del Diagrama */
+        .diagram-container {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+        }
+
+        /* Tabla comparativa */
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Consola de Comandos */
+        .terminal-box {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            padding: 18px;
+            border-radius: 8px;
+            font-family: "Courier New", Courier, monospace;
+            color: #e2e8f0;
+            font-size: 14px;
+            overflow-x: auto;
+            margin-top: 12px;
+            line-height: 1.6;
+        }
+
+        .comment { color: #64748b; }
+        .success { color: var(--accent-green); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Encabezado -->
+        <div class="header">
+            <div>
+                <h1>Rediseño como Sistema Distribuido <span class="badge">PFO 3</span></h1>
+                <p style="margin: 6px 0 0 0;">Programación sobre Redes — Arquitectura TCP con Pool de Workers y Colas</p>
+            </div>
+            <!-- Enlace al repositorio de GitHub -->
+            <a href="https://github.com/Luma2001/programacionsobreredes-pfo3" target="_blank" class="btn-github">
+                <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                Ver Repositorio en GitHub
+            </a>
+        </div>
+
+        <!-- Introducción -->
+        <h2>Descripción del Proyecto</h2>
+        <p>
+            Evolución de un sistema monolítico tradicional hacia una arquitectura cliente-servidor distribuida. 
+            El servidor socket implementa un <code>ThreadPoolExecutor</code> para desacoplar y balancear el procesamiento concurrente de tareas, garantizando entrega confiable y control de saturación.
+        </p>
+
+        <!-- Diagrama Mermaid Interactivo -->
+        <h2>Arquitectura Distribuida del Sistema</h2>
+        <div class="diagram-container">
+            <pre class="mermaid">
+flowchart TD
+    subgraph CAPA_CLIENTES ["1. Clientes"]
+        C1["📱 Clientes Móviles"]
+        C2["💻 Clientes Web"]
+        C3["🖥️ Clientes Consola"]
+    end
+
+    subgraph CAPA_BALANCEO ["2. Balanceo de Carga"]
+        LB["⚖️ Nginx / HAProxy"]
+    end
+
+    subgraph CAPA_SERVIDORES ["3. Servidores Socket"]
+        S1["⚙️ Servidor Socket 1"]
+        S2["⚙️ Servidor Socket 2"]
+    end
+
+    subgraph CAPA_BROKER ["4. Cola Asíncrona"]
+        MQ["📬 RabbitMQ Broker"]
+    end
+
+    subgraph CAPA_WORKERS ["5. Workers (Pool de Hilos)"]
+        W1["🧵 ThreadPoolExecutor 1"]
+        W2["🧵 ThreadPoolExecutor 2"]
+    end
+
+    subgraph CAPA_STORAGE ["6. Almacenamiento"]
+        DB[("🗄️ PostgreSQL")]
+        S3[("☁️ Amazon S3")]
+    end
+
+    C1 & C2 & C3 --> LB
+    LB --> S1 & S2
+    S1 & S2 --> MQ
+    MQ --> W1 & W2
+    W1 & W2 --> DB & S3
+            </pre>
+        </div>
+
+        <!-- Tabla Comparativa -->
+        <h2>Monolito (PFO 2) vs. Sistema Distribuido (PFO 3)</h2>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Criterio</th>
+                        <th>PFO 2 (Monolítico)</th>
+                        <th>PFO 3 (Distribuido)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Protocolo</strong></td>
+                        <td>HTTP / REST (Sin estado, petición-respuesta)</td>
+                        <td>TCP Sockets (Canal persistente y orientado a conexión)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Concurrencia</strong></td>
+                        <td>Manejada por el servidor web integrado de Flask</td>
+                        <td>Pool dedicado de hilos reutilizables (<code>ThreadPoolExecutor</code>)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Persistencia</strong></td>
+                        <td>Base de datos local en disco embebido (SQLite)</td>
+                        <td>PostgreSQL (ACID) y Amazon S3 (Almacenamiento de objetos)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Captura de pantalla-->
+        <h2 class="section-title">Capturas de pantalla</h2>
+        <div class="terminal-box">
+            <div style="margin-top: 25px; text-align: center;">
+                <h3 style="color: #ffffff;">Demostración Carga Recurrente</h3>
+                <video width="100%" max-width="720" controls style="border-radius: 8px; border: 1px solid #334155;">
+                    <source src="capturas/pruebaCargaRecurrente.mp4" type="video/mp4">
+                    Tu navegador no soporta reproducción de video HTML5.
+                </video>
+            </div>          
+        </div>
+    </div>
+</body>
+</html>

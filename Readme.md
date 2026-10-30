@@ -74,7 +74,22 @@ flowchart TD
 
 ---
 
-## 3. Ejecución de la Implementación en Python
+## 📊 3. Análisis Comparativo: Monolito (PFO 2) vs. Sistema Distribuido (PFO 3)
+
+| Criterio de Comparación | Monolito Centralizado (PFO 2) | Arquitectura Distribuida (PFO 3) |
+| :--- | :--- | :--- |
+| **Protocolo y Comunicación** | HTTP / REST síncrono mediante endpoints en Flask (`POST`, `GET`). | Sockets TCP directos (`SOCK_STREAM`) para control de bajo nivel + cola de mensajes (RabbitMQ). |
+| **Punto Único de Fallo (SPOF)** | **Alto:** Si el proceso `servidor.py` cae, todo el sistema queda inoperativo. | **Bajo:** Nodos redundantes detrás de un balanceador y colas persistentes aseguran alta disponibilidad. |
+| **Escalabilidad** | **Vertical:** Limitada a aumentar CPU/RAM en la máquina local. | **Horizontal:** Se pueden añadir múltiples instancias de servidores y nodos workers según la demanda. |
+| **Persistencia de Datos** | Archivo local `tareas.db` (SQLite). Bloquea la base de datos ante escrituras concurrentes. | PostgreSQL clusterizado (ACID distribuido) y almacenamiento de objetos S3 para archivos no estructurados. |
+| **Modelo de Ejecución** | Síncrono/Bloqueante en la petición HTTP (el cliente espera a que termine el procesamiento). | Asíncrono y desacoplado mediante buffer de mensajes y pool de workers dedicados. |
+| **Manejo de Concurrencia** | Gestionado por el servidor WSGI/Flask en un solo host. | Concurrencia controlada por nodo mediante `ThreadPoolExecutor` y balanceo perimetral. |
+| **Transparencia en Red** | Nula: El cliente apunta a una IP y puerto fijos (`http://127.0.0.1:5000`). | Alta: Transparencia de localización, concurrencia y tolerancia a fallos oculta detrás del proxy/broker. |
+
+---
+
+
+## 4. Ejecución de la Implementación en Python
 
 La solución implementada utiliza la librería estándar de Python (`socket`, `threading`, `concurrent.futures`, `json`), prescindiendo de dependencias de terceros.
 
