@@ -113,11 +113,26 @@
             background: var(--code-bg);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 20px;
+            padding: 30px 20px60px 20px;
             margin: 20px 0;
             display: flex;
             justify-content: center;
-            overflow-x: auto;
+            align-items: flex-start;
+            overflow: auto; 
+            position: visible;
+            cursor: zoom-in;
+        }
+
+        .diagram-container svg,
+        .diagram-container pre.mermaid {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: top center;
+        }
+
+        /* Efecto hover: agranda un 25% el diagrama */
+        .diagram-container:hover svg,
+        .diagram-container:hover pre.mermaid {
+            transform: scale(1.25);
         }
 
         /* Tabla comparativa */
